@@ -1,0 +1,267 @@
+1
+select last_name,employees.salary,t.maxsal,employees.department_id
+from employees
+join (select department_id,max(salary) as maxsal from employees GROUP BY department_id) t
+on employees.department_id=t.department_id 
+AND employees.salary=t.maxsal
+
+
+
+2
+SELECT
+	last_name,
+	employees.department_id,
+	employees.salary,
+	t.avgaal 
+FROM
+	employees
+	JOIN ( SELECT department_id, avg( salary ) AS avgaal FROM employees GROUP BY department_id ) t ON employees.department_id = t.department_id 
+WHERE
+	employees.salary > t.avgaal ;
+
+
+
+3
+SELECT
+    department_id,
+    AVG(salary) AS average_salary
+FROM
+    employees
+GROUP BY
+    department_id;
+
+
+4
+SELECT
+    e1.last_name,
+    e1.department_id,
+    e1.salary
+FROM
+    employees e1
+LEFT JOIN employees e2 ON e1.department_id = e2.department_id AND e1.salary < e2.salary
+WHERE
+    e2.salary IS NULL;
+
+
+
+5
+SELECT
+    department_id,
+    department_name,
+    avg_salary
+FROM
+    (
+        SELECT
+            e.department_id,
+            d.department_name,
+            AVG(e.salary) AS avg_salary
+        FROM
+            employees e
+        JOIN
+            departments d ON e.department_id = d.department_id
+        GROUP BY
+            e.department_id, d.department_name
+    ) AS avg_salaries
+ORDER BY
+    avg_salary DESC
+LIMIT 1;
+
+
+
+6
+SELECT
+    department_id,
+    department_name,
+    avg_salary
+FROM
+    (
+        SELECT
+            e.department_id,
+            d.department_name,
+            AVG(e.salary) AS avg_salary
+        FROM
+            employees e
+        JOIN
+            departments d ON e.department_id = d.department_id
+        GROUP BY
+            e.department_id, d.department_name
+        ORDER BY
+            avg_salary
+        LIMIT 1
+    ) AS lowest_avg_salary_dept;
+
+
+
+
+7
+SELECT DISTINCT
+    leader.last_name AS leader_name
+FROM
+    employees AS leader
+INNER JOIN employees AS employee
+    ON leader.employee_id = employee.manager_id
+WHERE
+    leader.salary > (
+        SELECT MAX(salary) FROM employees WHERE employee_id NOT IN (SELECT DISTINCT manager_id FROM employees WHERE manager_id IS NOT NULL)
+    );
+
+
+
+8
+SELECT
+    employee_id,
+    first_name,
+    last_name,
+    salary
+FROM
+    employees
+ORDER BY
+    salary DESC
+LIMIT 5;
+
+
+9
+SELECT
+    employee_id,
+    first_name,
+    last_name,
+    salary
+FROM
+    employees
+ORDER BY
+    salary DESC
+LIMIT 5 OFFSET 5;
+
+
+10
+SELECT
+    employee_id,
+    first_name,
+    last_name,
+    hiredate
+FROM
+    employees
+ORDER BY
+    hiredate DESC
+LIMIT 5;
+
+
+
+11
+SELECT
+    salary,
+    COUNT(*) AS num_employees
+FROM
+    employees
+GROUP BY
+    salary;
+
+
+
+
+12
+SELECT
+    e1.employee_id AS employee_id,
+    e1.first_name AS employee_first_name,
+    e1.last_name AS employee_last_name,
+    e2.first_name AS manager_first_name,
+    e2.last_name AS manager_last_name
+FROM
+    employees e1
+LEFT JOIN employees e2
+    ON e1.manager_id = e2.employee_id;
+
+
+
+13
+SELECT
+    e1.employee_id,
+    e1.first_name,
+    e1.last_name,
+    d.department_name
+FROM
+    employees e1
+JOIN employees e2 ON e1.manager_id = e2.employee_id
+JOIN departments d ON e1.department_id = d.department_id
+WHERE
+    e1.hiredate < e2.hiredate;
+
+
+14
+SELECT
+    d.department_name,
+    e.employee_id,
+    e.first_name,
+    e.last_name
+FROM
+    departments d
+LEFT JOIN employees e ON d.department_id = e.department_id
+ORDER BY
+    d.department_name,
+    e.employee_id;
+
+
+
+15
+SELECT
+    d.department_id,
+    d.department_name,
+    COUNT(e.employee_id) AS num_employees
+FROM
+    departments d
+JOIN employees e ON d.department_id = e.department_id
+GROUP BY
+    d.department_id, d.department_name
+HAVING
+    COUNT(e.employee_id) >= 5;
+
+
+
+16
+SELECT
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.salary
+FROM
+    employees e
+JOIN
+    employees smith ON e.salary > smith.salary
+WHERE
+    smith.last_name = 'Smith';
+
+
+
+
+17
+SELECT
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    d.department_name,
+    COUNT(*) AS department_count
+FROM
+    employees e
+JOIN
+    departments d ON e.department_id = d.department_id
+WHERE
+    e.job_id = 'clerk'
+GROUP BY
+    e.employee_id, e.first_name, e.last_name, d.department_name;
+
+
+
+18
+SELECT
+    j.job_id,
+    j.job_title,
+    COUNT(*) AS num_employees
+FROM
+    employees e
+JOIN
+    jobs j ON e.job_id = j.job_id
+WHERE
+    j.min_salary > 1500
+GROUP BY
+    j.job_id, j.job_title;
+
